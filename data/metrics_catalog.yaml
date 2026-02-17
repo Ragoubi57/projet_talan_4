@@ -1,0 +1,140 @@
+# ------------------------------------------------------------------
+# Metrics Catalog  –  Verifiable Banking Analytics Agent
+# ------------------------------------------------------------------
+# Each data product lists its fields, allowed dimensions, metrics,
+# sensitivity tags, and version.
+
+data_products:
+  - name: dp_complaints
+    description: "CFPB consumer complaint facts (sanitized). Narrative fields are HIGH sensitivity."
+    table: dp_complaints
+    version: "1.2.0"
+    freshness: "daily"
+    dimensions:
+      - date_received
+      - product
+      - issue
+      - company
+      - state
+      - channel
+    metrics:
+      - complaint_volume
+      - timely_response_rate
+      - disputed_rate
+    fields:
+      - {name: complaint_id, sensitivity: LOW}
+      - {name: date_received, sensitivity: LOW}
+      - {name: product, sensitivity: LOW}
+      - {name: issue, sensitivity: LOW}
+      - {name: company, sensitivity: LOW}
+      - {name: state, sensitivity: LOW}
+      - {name: channel, sensitivity: LOW}
+      - {name: timely, sensitivity: LOW}
+      - {name: disputed, sensitivity: LOW}
+      - {name: consumer_complaint_narrative, sensitivity: HIGH}
+
+  - name: dp_call_reports
+    description: "FDIC/FFIEC quarterly bank financials (assets, deposits, net income, NPA, Tier-1)."
+    table: dp_call_reports
+    version: "2.0.1"
+    freshness: "quarterly"
+    dimensions:
+      - quarter
+      - bank_name
+    metrics:
+      - net_income
+      - total_assets
+      - total_deposits
+      - npa_ratio
+      - tier1_ratio
+    fields:
+      - {name: quarter, sensitivity: LOW}
+      - {name: bank_name, sensitivity: LOW}
+      - {name: bank_id, sensitivity: LOW}
+      - {name: assets, sensitivity: LOW}
+      - {name: deposits, sensitivity: LOW}
+      - {name: net_income, sensitivity: LOW}
+      - {name: npa, sensitivity: LOW}
+      - {name: tier1_ratio, sensitivity: LOW}
+
+  - name: dp_macro_rates
+    description: "Daily FRED macro rates (fed funds, 10-year treasury)."
+    table: dp_macro_rates
+    version: "1.0.0"
+    freshness: "daily"
+    dimensions:
+      - rate_date
+    metrics:
+      - fed_funds_rate
+      - treasury_10y_rate
+    fields:
+      - {name: rate_date, sensitivity: LOW}
+      - {name: fed_funds, sensitivity: LOW}
+      - {name: treasury_10y, sensitivity: LOW}
+
+# ------------------------------------------------------------------
+# KPI definitions (semantic layer)
+# ------------------------------------------------------------------
+metrics:
+  - id: complaint_volume
+    description: "Total number of consumer complaints"
+    data_product: dp_complaints
+    expression: "COUNT(*)"
+    grain: [month, quarter]
+    allowed_dimensions: [product, state, company, channel, issue]
+    sensitivity: LOW
+    version: "1.0.0"
+
+  - id: net_income
+    description: "Total net income for US banks"
+    data_product: dp_call_reports
+    expression: "SUM(net_income)"
+    grain: [quarter]
+    allowed_dimensions: [bank_name]
+    sensitivity: LOW
+    version: "1.0.0"
+
+  - id: total_assets
+    description: "Total assets held by banks"
+    data_product: dp_call_reports
+    expression: "SUM(assets)"
+    grain: [quarter]
+    allowed_dimensions: [bank_name]
+    sensitivity: LOW
+    version: "1.0.0"
+
+  - id: total_deposits
+    description: "Total deposits held by banks"
+    data_product: dp_call_reports
+    expression: "SUM(deposits)"
+    grain: [quarter]
+    allowed_dimensions: [bank_name]
+    sensitivity: LOW
+    version: "1.0.0"
+
+  - id: npa_ratio
+    description: "Average non-performing assets ratio"
+    data_product: dp_call_reports
+    expression: "AVG(npa)"
+    grain: [quarter]
+    allowed_dimensions: [bank_name]
+    sensitivity: LOW
+    version: "1.0.0"
+
+  - id: tier1_ratio
+    description: "Average Tier 1 capital ratio"
+    data_product: dp_call_reports
+    expression: "AVG(tier1_ratio)"
+    grain: [quarter]
+    allowed_dimensions: [bank_name]
+    sensitivity: LOW
+    version: "1.0.0"
+
+  - id: complaint_narrative
+    description: "Raw complaint narrative text"
+    data_product: dp_complaints
+    expression: "consumer_complaint_narrative"
+    grain: [day]
+    allowed_dimensions: []
+    sensitivity: HIGH
+    version: "1.0.0"
