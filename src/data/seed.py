@@ -47,9 +47,9 @@ def seed_database(db_path: str = ":memory:") -> duckdb.DuckDBPyConnection:
     random.seed(42)
     rows = []
     cid = 1
-    for year in range(2020, 2026):
+    for year in range(2020, 2027):
         for month in range(1, 13):
-            if year == 2025 and month > 6:
+            if year == 2026 and month > 12:
                 break
             n = random.randint(30, 80)
             for _ in range(n):
@@ -89,10 +89,8 @@ def seed_database(db_path: str = ":memory:") -> duckdb.DuckDBPyConnection:
     bid = 1
     for bank in companies:
         base_assets = random.uniform(500_000, 3_000_000)
-        for year in range(2020, 2026):
+        for year in range(2020, 2027):
             for q in range(1, 5):
-                if year == 2025 and q > 2:
-                    break
                 quarter_str = f"{year}-Q{q}"
                 assets = base_assets * (1 + random.uniform(-0.02, 0.05))
                 deposits = assets * random.uniform(0.6, 0.8)
@@ -124,7 +122,7 @@ def seed_database(db_path: str = ":memory:") -> duckdb.DuckDBPyConnection:
     ff = 1.5
     t10 = 2.0
     d = date(2020, 1, 1)
-    while d <= date(2025, 6, 30):
+    while d <= date(2026, 12, 31):
         ff += random.uniform(-0.05, 0.05)
         t10 += random.uniform(-0.03, 0.04)
         ff = max(0.0, ff)

@@ -5,6 +5,14 @@ from __future__ import annotations
 import io
 import json
 import csv
+import os
+import sys
+
+# Ensure project root is on sys.path so `src.*` imports work when
+# Streamlit is launched from the repo root via `streamlit run src/ui/app.py`.
+_project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
 
 import altair as alt
 import pandas as pd

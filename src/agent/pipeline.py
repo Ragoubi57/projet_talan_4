@@ -124,9 +124,10 @@ def run_agent(
 
     # Detect outliers (simple IQR on first numeric column)
     outlier_indices: list[int] = []
-    numeric_cols = [c for c in columns if any(isinstance(row[columns.index(c)], (int, float)) for row in rows[:1])]
+    col_index = {c: i for i, c in enumerate(columns)}
+    numeric_cols = [c for c in columns if rows and isinstance(rows[0][col_index[c]], (int, float))]
     if numeric_cols and len(rows) >= 4:
-        col_idx = columns.index(numeric_cols[-1])  # use last numeric col (the metric)
+        col_idx = col_index[numeric_cols[-1]]
         values = sorted(row[col_idx] for row in rows if isinstance(row[col_idx], (int, float)))
         q1 = values[len(values) // 4]
         q3 = values[3 * len(values) // 4]
